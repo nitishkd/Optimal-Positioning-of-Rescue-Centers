@@ -10,7 +10,6 @@ class Message:
     client = Client(ACCOUNT_SID, AUTH_TOKEN)
     seperator = "####"
 
-
     def __init__(self, body="", to_sent="", recieved_from=""):
         self.body = body
         self.recieved_from = ""
@@ -39,24 +38,24 @@ class Message:
         data = self.body.split(Message.seperator)
         longitude = ""
         lattitude = ""
-        no_of_people = ""
+        number_of_persons = ""
         if not data[0]:
             data = data[1:] 
             location = data[0].split(",")
             lattitude = location[0]
             longitude = location[1]
-            no_of_people = data[1]
+            number_of_persons = data[1]
             self.inform_other_person()
             
         else:
             location_text = data[0]
             maps = GoogleMapsInteraction.GoogleMaps
             lattitude, longitude = maps.getLatLngFromText(location_text)
-            no_of_people = data[1]
+            number_of_persons = data[1]
         
         database_data = {'lattitude':lattitude,'longitude':longitude}
-        database_data['no_of_people'] = no_of_people
-        database_data['mo_number'] = self.recieved_from
-        database_interaction.insert("AffectedPeople", **database_data)
+        database_data['number_of_persons'] = number_of_persons
+        database_data['mobile_number'] = self.recieved_from
+        database_interaction.insert("affected_people", **database_data)
 
     #print(message.sid)

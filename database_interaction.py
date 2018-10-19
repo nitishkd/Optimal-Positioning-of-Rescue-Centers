@@ -1,24 +1,25 @@
 import sqlite3
 def intialize():
-	connection = sqlite3.connect('app.db')
-	crsr = connection.cursor()
-	sql_command = """CREATE TABLE users (  
-	name VARCHAR(40),
-	address VARCHAR(40),
-	email VARCHAR(40),
-	mobile_number VARCHAR(20) PRIMARY KEY,
-	emergency_mobile_number VARCHAR(20);"""
-	crsr.execute(sql_command)
+    conn = sqlite3.connect('app.db')
+    sql_command = "CREATE TABLE users (\
+    name VARCHAR(40),\
+    address VARCHAR(40),\
+    email VARCHAR(40),\
+    mobile_number VARCHAR(20) PRIMARY KEY,\
+    emergency_mobile_number VARCHAR(20) );"
+    conn.execute(sql_command)
 
-	sql_command = """CREATE TABLE affected_people (  
-	lat DECIMAL(10,8),
-	lng DECIMAL(11,8),
-	mobile_number VARCHAR(20) PRIMARY KEY,
-	number_of_persons INTEGER;"""
-	crsr.execute(sql_command)
+    sql_command = "CREATE TABLE affected_people (  \
+    lattitude DECIMAL(10,8),\
+    longitude DECIMAL(11,8),\
+    mobile_number VARCHAR(20) PRIMARY KEY,\
+    number_of_persons INTEGER );"
+    conn.execute(sql_command)
 
-	connection.commit()
-	connection.close()
+    conn.commit()
+    conn.close()
+
+
 
 def insert(table_name, **kwargs):
     #something
@@ -30,8 +31,14 @@ def insert(table_name, **kwargs):
     attributes=attributes[:-1]
     values=values[:-1]
 
+    conn = sqlite3.connect('app.db')
+    conn.execute("INSERT INTO %s (%s) VALUES (%s)" %(table_name, attributes, values))
+    conn.commit()
+    conn.close()
     
     return
+
+
 
 def get_emergency_contact(mobile_number):
     conn = sqlite3.connect('app.db')
@@ -40,6 +47,8 @@ def get_emergency_contact(mobile_number):
         emergency_contact = row[0]
     conn.close()
     return emergency_contact
+    
+
     
 def get_name_location(mobile_number):
     conn = sqlite3.connect('app.db') 
@@ -56,6 +65,7 @@ def get_name_location(mobile_number):
     for row in cursor:
         result = result + " location " + row[0] + ":" + row[1]
     
+    conn.close()
     return result
 
     
