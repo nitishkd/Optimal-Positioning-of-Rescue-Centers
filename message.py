@@ -1,6 +1,6 @@
 from twilio.rest import Client
 import database_interaction
-
+import
 # Your Account Sid and Auth Token from twilio.com/console
 class Message:
     ACCOUNT_SID = 'ACb77c89f64c5ce3be57484c2b2ddf0e1d'
@@ -30,5 +30,6 @@ class Message:
             database_data['mo_number'] = self.recieved_from
             database_interaction.insert("AffectedPeople", **database_data)
 
-            self.inform_other_person
+            self.inform_other_person()
+
     #print(message.sid)
