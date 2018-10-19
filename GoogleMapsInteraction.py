@@ -31,10 +31,10 @@ class GoogleMaps():
 		if(len(y) != 0):
 			lat=y[0]['geometry']['location']['lat']
 			lng=y[0]['geometry']['location']['lng']
-			print lat , lng
+			print (lat , lng)
 			height = self.GetElevation(lat, lng)
 		else:
-			print "nothing"
+			print ("nothing")
 		return height
 
 
@@ -42,7 +42,7 @@ class GoogleMaps():
 		dx = radius;
 		dy = radius;
 		r_earth = 6387; 												##distances are in KM
-		partitions = 5;
+		self.partitions = 5;
 		a = latitude - (dy / r_earth ) * (180 / math.pi);
 		b = longitude - (dx / r_earth ) * (180 / math.pi ) / math.cos(latitude * math.pi / 180);
 		c = latitude + (dy / r_earth ) * (180 / math.pi);
@@ -54,8 +54,10 @@ class GoogleMaps():
 		maxLat = max(a,c);
 
 		corners = [[minLat, maxLong], [maxLat, maxLong], [maxLat, minLong], [minLat, minLong]];
-		rows , cols = partitions, partitions 
+		rows , cols = self.partitions, self.partitions 
 		self.GRID = [[0 for x in range(cols)] for y in range(rows)] 
+		self.POINTS = [[[] for x in range(cols)] for y in range(rows)] 
+		
 		i, j = 0,0;
 		LAT = np.arange(minLat, maxLat, (maxLat-minLat)/rows);
 		LON = np.arange(minLong, maxLong, (maxLong-minLong)/cols);
@@ -65,14 +67,36 @@ class GoogleMaps():
 			for longd in LON:
 				height = self.GetElevation(latd, longd)
 				self.GRID[i][j] = height;
+				self.POINTS[i][j] = [latd, longd] 
 				j += 1;
 			i += 1;
 
-		print (self.GRID);
+		# print (self.GRID);
+		# print (self.POINTS);
+
+	def SafeZones(self, threshold, flag):
+
+		resp = [];
+		if(flag == False):					## True for high points and False for low points
+			for i in range(self.partitions):
+				for j in range(self.partitions):
+					if(self.GRID[i][j] < threshold):
+						resp.append(self.POINTS[i][j]);
+
+		else:
+			for i in range(self.partitions):
+				for j in range(self.partitions):
+					if(self.GRID[i][j] > threshold):
+						resp.append(self.POINTS[i][j]);
+
+		return resp;
 
 if(__name__ == "__main__"):
 	obj = GoogleMaps();
 	# height = obj.GetElevation(39.7391536, -104.9847034)
 	# print (height)
 
-	obj.makeGrid(39.7391536, -104.9847034, 10);
+	obj.makeGrid(39.7391536, -104.9847034, 10);	
+	resp = obj.SafeZones(1600, False);
+
+	print (resp);
